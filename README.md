@@ -1,6 +1,9 @@
 ## golang-sample-with-template
 
-[Repository](https://github.com/FrancoPersonal/golang-sample-with-template)
+[![golang-sample-with-template release (latest SemVer)](https://img.shields.io/github/v/release/FrancoPersonal/golang-sample-with-template?sort=semver)](https://github.com/FrancoPersonal/golang-sample-with-template/releases)
+[![Go Reference](https://img.shields.io/static/v1?label=godoc&message=reference&color=blue)](https://github.com/FrancoPersonal/golang-sample-with-template)
+[![Test Coverage](images/badge.svg)](cover.html)
+
 
 
 ## Directory
