@@ -1,0 +1,58 @@
+name: Validate SAM Template
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**/*.yml'
+      - '**/*.yaml'
+      - 'src/**/*.go'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '**/*.yml'
+      - '**/*.yaml'
+      - 'src/**/*.go'
+
+jobs:
+  validate-template:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24.5'
+          cache: true
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Set up AWS SAM CLI
+        uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+          
+      - name: Build Go Binary
+        run: |
+          cd src/handlers/AwsSamLambdaSimple
+          GOOS=linux GOARCH=arm64 go build -tags lambda.norpc -o bootstrap main.go
+          
+      - name: Validate SAM template
+        run: |
+          cd src/handlers/AwsSamLambdaSimple
+          sam validate --template template.yml
+          
+      - name: Run SAM local tests
+        run: |
+          cd src/handlers/AwsSamLambdaSimple
+          sam local invoke --no-event
+          
+      - name: Test Go code
+        run: |
+          cd src/handlers/AwsSamLambdaSimple
+          go test -v ./...
