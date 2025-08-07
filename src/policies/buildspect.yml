@@ -1,0 +1,41 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Installing AWS SAM CLI and dependencies...
+      - curl -L "https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip" -o sam-cli.zip
+      - unzip sam-cli.zip -d sam-installation
+      - ./sam-installation/install
+      - sam --version
+
+  pre_build:
+    commands:
+      - echo Validating SAM template...
+      - sam validate --template lambdaroles.yml
+
+  build:
+    commands:
+      - echo Building and deploying with SAM...
+      - sam build --template lambdaroles.yml
+      - |
+        sam deploy \
+          --template-file .aws-sam/build/lambdaroles.yml \
+          --stack-name lambda-roles-stack \
+          --capabilities CAPABILITY_NAMED_IAM \
+          --no-confirm-changeset \
+          --no-fail-on-empty-changeset \
+          --parameter-overrides \
+            Environment=dev \
+            ProjectName=golang-sample
+
+  post_build:
+    commands:
+      - echo Deployment completed on `date`
+      - sam list endpoints --stack-name lambda-roles-stack
+
+artifacts:
+  files:
+    - lambdaroles.yml
+    - .aws-sam/**/*
+  discard-paths: no
